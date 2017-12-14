@@ -1,0 +1,486 @@
+    <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.18.1">
+    <title>ChainWalker – RT Rampage vdev</title>
+    <link rel="stylesheet" href="dist/app-c922dbe7ef.css" />
+    
+    <script src="dist/sidebar_items-aaf53cf7a3.js"></script>
+    
+    
+    
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+
+    <div class="main">
+<button class="sidebar-toggle">
+  <span class="icon-menu" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Sidebar</span>
+</button>
+<section class="sidebar">
+
+  
+  <a href="api-reference.html" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        RT Rampage
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        vdev
+      </h2>
+    </div>
+    
+  </a>
+
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <input name="q" type="text" id="search-list" class="search-input" placeholder="search" aria-label="Search" autocomplete="off" />
+  </form>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="visible-xs">RT Rampage vdev</small>
+        ChainWalker
+        
+      </h1>
+
+      
+        <section id="moduledoc">
+          <p>Documentation for ChainWalker.</p>
+
+        </section>
+      
+
+      
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+          
+
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#set_charset/2">set_charset(chain_walker_context, s_charset)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#set_charset_opts/4">set_charset_opts(chain_walker_context, s_charset, n_min_length, n_max_length)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#set_hash_routine/1">set_hash_routine(s_hash_routine)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Set the hash routine to use for hashing during operation</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#set_max_password_length/2">set_max_password_length(chain_walker_context, n_max_length)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#set_min_password_length/3">set_min_password_length(chain_walker_context, n_min_length, n_max_length)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Set minimum plain text password length to be included in the rainbow table</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#set_table_index/2">set_table_index(chain_walker_context, n_table_index)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#validate_arg/2">validate_arg(struct, argument)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Validates a given <code class="inline">argument</code>, by checking if it exists as a key in the <code class="inline">struct</code> provided</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#validate_min_password_length/2">validate_min_password_length(n_min_length, n_max_length)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Validates correctness of minimum password length argument</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#validate_routine/1">validate_routine(s_hash_routine)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Validates the given <code class="inline">hash_algorithm</code> argument, <code class="inline">s_hash_routine</code> by checking if the hash algorithm is supported</p>
+</div>
+  
+</div>
+
+  </div>
+
+
+          
+
+        </section>
+      
+
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="set_charset/2">
+  
+  
+  <div class="detail-header">
+    <a href="#set_charset/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">set_charset(chain_walker_context, s_charset)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="set_charset_opts/4">
+  
+  
+  <div class="detail-header">
+    <a href="#set_charset_opts/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">set_charset_opts(chain_walker_context, s_charset, n_min_length, n_max_length)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="set_hash_routine/1">
+  
+  
+  <div class="detail-header">
+    <a href="#set_hash_routine/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">set_hash_routine(s_hash_routine)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    <p>Set the hash routine to use for hashing during operation.</p>
+<h2 id="set_hash_routine/1-parameters" class="section-heading">
+  <a href="#set_hash_routine/1-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li><code class="inline">s_hash_routine</code>: String to select the hashing algorithm to use.
+</li>
+</ul>
+<h2 id="set_hash_routine/1-examples" class="section-heading">
+  <a href="#set_hash_routine/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; ChainWalker.set_hash_routine(&quot;md5&quot;)
+%ChainWalkerContext{charset: nil, hash_routine: :md5, max_length: nil, min_length: nil, table_index: nil}</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="set_max_password_length/2">
+  
+  
+  <div class="detail-header">
+    <a href="#set_max_password_length/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">set_max_password_length(chain_walker_context, n_max_length)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="set_min_password_length/3">
+  
+  
+  <div class="detail-header">
+    <a href="#set_min_password_length/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">set_min_password_length(chain_walker_context, n_min_length, n_max_length)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    <p>Set minimum plain text password length to be included in the rainbow table.</p>
+<h2 id="set_min_password_length/3-parameters" class="section-heading">
+  <a href="#set_min_password_length/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li><code class="inline">chain_walker_context</code>: %ChainWalkerContext{}
+</li>
+<li><code class="inline">n_min_length</code>: Minimum length for plain text passwords.
+</li>
+</ul>
+<h2 id="set_min_password_length/3-returns" class="section-heading">
+  <a href="#set_min_password_length/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<ul>
+<li><code class="inline">%ChainWalkerContext{}</code>
+</li>
+</ul>
+<h2 id="set_min_password_length/3-examples" class="section-heading">
+  <a href="#set_min_password_length/3-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; ChainWalker.set_min_password_length(%ChainWalkerContext{}, 1, 2)
+%ChainWalkerContext{charset: nil, hash_routine: nil, max_length: nil, min_length: 1, table_index: nil}</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="set_table_index/2">
+  
+  
+  <div class="detail-header">
+    <a href="#set_table_index/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">set_table_index(chain_walker_context, n_table_index)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="validate_arg/2">
+  
+  
+  <div class="detail-header">
+    <a href="#validate_arg/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">validate_arg(struct, argument)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    <p>Validates a given <code class="inline">argument</code>, by checking if it exists as a key in the <code class="inline">struct</code> provided.</p>
+<h2 id="validate_arg/2-parameters" class="section-heading">
+  <a href="#validate_arg/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li><code class="inline">struct</code>: Struct containing valid options and their values.
+</li>
+<li><code class="inline">argument</code>: Argument entered to be validated.
+</li>
+</ul>
+<h2 id="validate_arg/2-examples" class="section-heading">
+  <a href="#validate_arg/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; ChainWalker.validate_arg(%HashRoutines{}, &quot;md5&quot;)
+{:ok, :md5}
+iex&gt; ChainWalker.validate_arg(%HashRoutines{}, &quot;unknown_routine&quot;)
+{:error, &quot;Incorrect argument &#39;unknown_routine&#39;, is not supported!&quot;}</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="validate_min_password_length/2">
+  
+  
+  <div class="detail-header">
+    <a href="#validate_min_password_length/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">validate_min_password_length(n_min_length, n_max_length)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    <p>Validates correctness of minimum password length argument.</p>
+<h2 id="validate_min_password_length/2-parameters" class="section-heading">
+  <a href="#validate_min_password_length/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li><code class="inline">n_min_length</code>: Minimum plain text password length.
+</li>
+<li><code class="inline">n_max_length</code>: Maximum plain text password length.
+</li>
+</ul>
+<h2 id="validate_min_password_length/2-returns" class="section-heading">
+  <a href="#validate_min_password_length/2-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<ul>
+<li><code class="inline">{ :ok, n_min_length }</code>
+</li>
+<li><code class="inline">{ :error, reason }</code>
+</li>
+</ul>
+<h2 id="validate_min_password_length/2-examples" class="section-heading">
+  <a href="#validate_min_password_length/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; ChainWalker.validate_min_password_length(1, 2)
+{:ok, 1}
+iex&gt; ChainWalker.validate_min_password_length(2, 1)
+{:error, &quot;Bad argument: Minimum password length (2) cannot be greater than maximum length (1).&quot;}
+iex&gt; ChainWalker.validate_min_password_length(0, 2)
+{:error, &quot;Bad argument: Mininum password length (0) cannot be zero or less.&quot;}
+iex&gt; ChainWalker.validate_min_password_length(10, 10)
+{:error, &quot;Bad argument: Minimum password length (10) cannot be greater than maximum supported password length (9).&quot; }</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="validate_routine/1">
+  
+  
+  <div class="detail-header">
+    <a href="#validate_routine/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">validate_routine(s_hash_routine)</span>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    <p>Validates the given <code class="inline">hash_algorithm</code> argument, <code class="inline">s_hash_routine</code> by checking if the hash algorithm is supported.</p>
+<h2 id="validate_routine/1-parameters" class="section-heading">
+  <a href="#validate_routine/1-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li><code class="inline">s_hash_routine</code>: String to select the hashing algorithm to use.
+</li>
+</ul>
+<h2 id="validate_routine/1-examples" class="section-heading">
+  <a href="#validate_routine/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; ChainWalker.validate_routine(&quot;md5&quot;)
+{:ok, :md5}</code></pre>
+
+  </section>
+</div>
+
+        </section>
+      
+
+      
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.18.1),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+        <button class="night-mode-toggle"><span class="sr-only">Switch theme</span></button>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-778c9ef903.js"></script>
+  
+  
+  
+  
+  </body>
+</html>
+
