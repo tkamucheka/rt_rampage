@@ -87,6 +87,8 @@ defmodule ChainWalker do
     set_charset(chain_walker_context, s_charset)
     |> set_min_password_length(n_min_length, n_max_length)
     |> set_max_password_length(n_min_length, n_max_length)
+    |> set_plain_space_up_to_x(n_min_length, n_max_length)
+    #|> set_plain_space_total()
   end
 
   def set_charset(chain_walker_context, s_charset) do
@@ -218,6 +220,54 @@ defmodule ChainWalker do
   end
 
   @doc """
+  Set plain space upto x
+  """
+  def set_plain_space_up_to_x(chain_walker_context, n_min_length, n_max_length) do
+    max_plain_len = 256
+    plain_space_upto_x = Enum.map(1..(max_plain_len+1), fn _ -> 0 end)
+    n_temp = 1
+
+    for i <- 1..n_max_length do
+      # plain_space_upto_x = List.update_at(plain_space_upto_x, i, &(&1 = 1))
+      # n_temp = n_temp * Map.get(chain_walker_context, :charset_length)
+      # if i >= n_min_length do
+        # List.update_at plain_space_upto_x, i, fn _ ->
+        #   IO.puts "index: #{i}\t plain_space_var: #{Enum.at(plain_space_upto_x, i)}\ttemp_value: #{n_temp}"
+        #   Enum.at(plain_space_upto_x, i) + n_temp
+        # end
+        # plain_space_upto_x = List.update_at(plain_space_upto_x, 0, &(&1 = 1))
+      # end
+    end
+
+    # r = Enum.map(plain_space_upto_x, (any() -> any()))
+
+    r = for i <- 1..n_max_length do
+      n_temp = n_temp * Map.get(chain_walker_context, :charset_length)
+      if i < n_min_length do
+        List.update_at(plain_space_upto_x, i, &(&1 = 0))
+      else
+        List.update_at(plain_space_upto_x, i, &(&1 = Enum.at(plain_space_upto_x, i) +1))
+      end
+    end
+
+    for i <- 1..n_max_length, do: Enum.at(plain_space_upto_x, i)
+    |> List.update_at(i, fn _ -> 1 end)
+
+    IO.inspect plain_space_upto_x
+    # for elem <- 1..n_max_length, do
+
+    # updated_list = List.update_at(plain_space_upto_x, 0, &(&1 = 1))
+    %{ chain_walker_context | plain_space_upto_x: plain_space_upto_x }
+  end
+
+  @doc """
+  Set plain space total
+  """
+  def set_plain_space_total(chain_walker_context) do
+    chain_walker_context
+  end
+
+  @doc """
   Set table index for current operation.
 
   ## Parameters
@@ -235,5 +285,14 @@ defmodule ChainWalker do
   def set_table_index(chain_walker_context, n_table_index) do
     if n_table_index < 0, do: raise ArgumentError, message: "Table index (#{n_table_index}) cannot be less than zero (0)."
     %{ chain_walker_context | table_index: n_table_index }
+  end
+
+  @doc """
+  Generate random index
+  """
+  def generate_random_index(chain_walker_context) do
+    # <<random_bytes::64>> = :crypto.rand_bytes(8)
+    # n_index = rem(random_bytes, Map.get(chain_walker_context, nPlainSpaceTotal))
+    # %{ chain_walker_context | m_n_index: n_index }
   end
 end
