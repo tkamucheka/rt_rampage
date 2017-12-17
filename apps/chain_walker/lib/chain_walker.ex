@@ -85,10 +85,11 @@ defmodule ChainWalker do
   """
   def set_charset_opts(chain_walker_context, s_charset, n_min_length, n_max_length) do
     set_charset(chain_walker_context, s_charset)
+    |> set_charset_length
     |> set_min_password_length(n_min_length, n_max_length)
     |> set_max_password_length(n_min_length, n_max_length)
     |> set_plain_space_up_to_x(n_min_length, n_max_length)
-    #|> set_plain_space_total()
+    |> set_plain_space_total(n_max_length)
   end
 
   def set_charset(chain_walker_context, s_charset) do
@@ -97,6 +98,12 @@ defmodule ChainWalker do
       { :ok, charset }  -> %{ chain_walker_context | charset: Map.get(charsets, charset) }
       { _, reason }     -> raise ArgumentError, message: reason
     end
+  end
+
+  def set_charset_length(chain_walker_context) do
+    length = Map.get(chain_walker_context, :charset)
+    |> length
+    %{ chain_walker_context | charset_length: length }
   end
 
   @doc """
@@ -224,47 +231,40 @@ defmodule ChainWalker do
   """
   def set_plain_space_up_to_x(chain_walker_context, n_min_length, n_max_length) do
     max_plain_len = 256
-    plain_space_upto_x = Enum.map(1..(max_plain_len+1), fn _ -> 0 end)
-    n_temp = 1
 
-    for i <- 1..n_max_length do
-      # plain_space_upto_x = List.update_at(plain_space_upto_x, i, &(&1 = 1))
-      # n_temp = n_temp * Map.get(chain_walker_context, :charset_length)
-      # if i >= n_min_length do
-        # List.update_at plain_space_upto_x, i, fn _ ->
-        #   IO.puts "index: #{i}\t plain_space_var: #{Enum.at(plain_space_upto_x, i)}\ttemp_value: #{n_temp}"
-        #   Enum.at(plain_space_upto_x, i) + n_temp
-        # end
-        # plain_space_upto_x = List.update_at(plain_space_upto_x, 0, &(&1 = 1))
-      # end
-    end
+    n_plain_space_upto_x = Enum.map(1..(max_plain_len+1), &(&1=0))
+    charset_length = Map.get(chain_walker_context, :charset_length)
 
-    # r = Enum.map(plain_space_upto_x, (any() -> any()))
+    result = index_builder(n_plain_space_upto_x, 1, 1, charset_length, n_min_length, n_max_length)
 
-    r = for i <- 1..n_max_length do
-      n_temp = n_temp * Map.get(chain_walker_context, :charset_length)
-      if i < n_min_length do
-        List.update_at(plain_space_upto_x, i, &(&1 = 0))
-      else
-        List.update_at(plain_space_upto_x, i, &(&1 = Enum.at(plain_space_upto_x, i) +1))
+    %{ chain_walker_context | plain_space_upto_x: result }
+  end
+
+  def index_builder(n_plain_space_upto_x, index, temp, plain_charset_length, n_min_length, n_max_length) do
+    n_temp = temp * plain_charset_length
+
+    n_plain_space_upto_x =
+      case index >= n_min_length do
+        true  ->
+          x = Enum.at(n_plain_space_upto_x, index-1) + n_temp
+          List.update_at(n_plain_space_upto_x, index, &(&1 = x))
+        _     -> n_plain_space_upto_x
       end
+
+    case index <= n_max_length do
+      true  ->
+        index_builder(n_plain_space_upto_x, index+1, n_temp, plain_charset_length, n_min_length, n_max_length)
+      _     -> n_plain_space_upto_x
     end
-
-    for i <- 1..n_max_length, do: Enum.at(plain_space_upto_x, i)
-    |> List.update_at(i, fn _ -> 1 end)
-
-    IO.inspect plain_space_upto_x
-    # for elem <- 1..n_max_length, do
-
-    # updated_list = List.update_at(plain_space_upto_x, 0, &(&1 = 1))
-    %{ chain_walker_context | plain_space_upto_x: plain_space_upto_x }
   end
 
   @doc """
   Set plain space total
   """
-  def set_plain_space_total(chain_walker_context) do
-    chain_walker_context
+  def set_plain_space_total(chain_walker_context, n_max_length) do
+    total = Map.get(chain_walker_context, :plain_space_upto_x)
+    |> Enum.at(n_max_length)
+    %{ chain_walker_context | plain_space_total: total }
   end
 
   @doc """
@@ -291,8 +291,29 @@ defmodule ChainWalker do
   Generate random index
   """
   def generate_random_index(chain_walker_context) do
-    # <<random_bytes::64>> = :crypto.rand_bytes(8)
-    # n_index = rem(random_bytes, Map.get(chain_walker_context, nPlainSpaceTotal))
-    # %{ chain_walker_context | m_n_index: n_index }
+    <<random_bytes::64>> = :crypto.strong_rand_bytes(8)
+    n_index = rem(random_bytes, Map.get(chain_walker_context, :plain_space_total))
+    %{ chain_walker_context | m_n_index: n_index }
+  end
+
+  @doc """
+  Index to plain
+  """
+  def index_to_plain(chain_walker_context) do
+    plain_length_index = get_plain_length(chain_walker_context, chain_walker_context.max_length-1)
+
+    n_index_of_x = chain_walker_context.m_n_index - Enum.at(chain_walker_context.plain_space_upto_x, plain_length_index-1)
+
+
+  end
+
+  def get_plain_length(chain_walker_context, index) do
+    case chain_walker_context.m_n_index >= Enum.at(chain_walker_context.plain_space_upto_x, index) do
+      true  -> index + 1
+      _     ->
+        if index >= chain_walker_context.min_length do
+          get_plain_length(chain_walker_context, index-1)
+        end
+    end
   end
 end

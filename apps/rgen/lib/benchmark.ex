@@ -8,7 +8,10 @@ defmodule Benchmark do
   def run(s_hash_routine, s_charset, n_min_length, n_max_length, n_table_index) do
     # Potential for using GenServer ChainWalker
     chain_walker_context = ChainWalker.set_hash_routine(s_hash_routine)
-    |> ChainWalker.set_charset(s_charset, n_min_length, n_max_length)
+    |> ChainWalker.set_charset_opts(s_charset, n_min_length, n_max_length)
     |> ChainWalker.set_table_index(n_table_index)
+
+    cwc = ChainWalker.generate_random_index(chain_walker_context)
+    |> ChainWalker.index_to_plain 
   end
 end
