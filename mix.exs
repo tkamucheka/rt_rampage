@@ -22,7 +22,8 @@ defmodule RtRampage.Mixfile do
   # Run "mix help deps" for examples and options.
   defp deps do
     [
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:benchee, "~> 0.11", only: :dev}
     ]
   end
 end
