@@ -1,6 +1,33 @@
 defmodule Rgen do
   @moduledoc """
   Documentation for Rgen.
+
+  usage: rtgen hash_algorithm=<algorithm> \\
+	              plain_charset=<path> plain_len_min=<number> plain_len_max=<number> \\
+	              rainbow_table_index=<number> \\
+	              rainbow_chain_length=<number> rainbow_chain_count=<number> \\
+	              file_title_suffix=<any>
+	        rtgen hash_algorithm=<algorithm> \\
+	              plain_charset=<path> plain_len_min=<number> plain_len_max=<number> \\
+	              rainbow_table_index=<number> \\
+	              -bench
+
+	hash_algorithm:       available: []
+	plain_charset:        use any charset name in charset.txt here
+	                       use \"byte\" to specify all 256 characters as the charset of the plaintext
+	plain_len_min:        min length of the plaintext
+	plain_len_max:        max length of the plaintext
+	rainbow_table_index:  index of the rainbow table
+	rainbow_chain_length: length of the rainbow chain
+	rainbow_chain_count:  count of the rainbow chain to generate
+	file_title_suffix:    the string appended to the file title
+	                       add your comment of the generated rainbow table here
+  -bench:               do some benchmark
+  
+	example: rtgen lm alpha 1 7 0 100 16 test
+	          rtgen md5 byte 4 4 0 100 16 test
+	          rtgen sha1 numeric 1 10 0 100 16 test
+	          rtgen lm alpha 1 7 0 -bench
   """
 
   @doc """
@@ -15,7 +42,7 @@ defmodule Rgen do
   """
   def parse_args(args) do
     # Default options
-    options = %{ filename_suffix: "" }
+    options = %{ filename_suffix: 0 }
     # Parse args
     cmd_opts = OptionParser.parse(
       args,
@@ -88,6 +115,7 @@ defmodule Rgen do
       if options.benchmark do
         Benchmark.run(options.hashtype, options.charset, options.minlength, options.maxlength, options.tableindex)
       end
+      System.halt(0)
     end
 
     unless Enum.count(options) == 8 do
@@ -120,7 +148,7 @@ defmodule Rgen do
 
     IO.inspect chain_walker_context
 
-    s_filename = "#{s_hash_routine}_#{s_charset}##{n_min_length}_#{n_max_length}_#{n_table_index}_#{n_chain_length}x#{n_numchains}_#{s_filename_suffix}.rt"
+    s_filename = "#{s_hash_routine}_#{s_charset}##{n_min_length}-#{n_max_length}_#{n_table_index}_#{n_chain_length}x#{n_numchains}_#{s_filename_suffix}.rt"
 
     case File.open(s_filename, [:append, :binary]) do
       { :ok, file }       -> File.close(file)
@@ -156,15 +184,15 @@ defmodule Rgen do
 
       # n_index = chain_walker_context.n_index
 
-      IO.binwrite file, <<chain_walker_context.n_index::32>>
+      IO.binwrite file, <<chain_walker_context.n_index::64>>
 
       chain_walker_context = step(chain_walker_context, n_chain_length, n_numchains)
 
-      IO.binwrite file, <<chain_walker_context.n_index::32>>
+      IO.binwrite file, <<chain_walker_context.n_index::64>>
 
       if rem(index+1, 100000) == 0 || index+1 == n_numchains do
         finish_time = System.system_time
-        n_second = div((finish_time - start_time), 100000000)
+        n_second = div((finish_time - start_time), 1000000)
         IO.puts "#{index+1} of #{n_numchains} rainbow chains generated (#{div(n_second, 60)} m #{rem(n_second, 60)} s)"
       end
     end
