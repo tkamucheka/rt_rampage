@@ -338,15 +338,15 @@ defmodule ChainWalker do
     build_plain(chain_walker_context, n_index_of_x, m_plain, chain_walker_context.n_plain_length-1)
   end
 
-  defp build_plain(chain_walker_context, n_index_of_x, plain, index) do
+  defp build_plain(chain_walker_context, n_index_of_x, m_plain, index) do
     case index >= 0 do
       true  ->
         char = Enum.at(chain_walker_context.s_charset, rem(n_index_of_x, chain_walker_context.n_charset_length))
-        l = List.update_at(plain, index, &(&1 = char))
+        l = List.update_at(m_plain, index, &(&1 = char))
         n_index_of_x = div(n_index_of_x, chain_walker_context.n_charset_length)
         build_plain(chain_walker_context, n_index_of_x, l, index-1)
       _     ->
-        %{ chain_walker_context | s_plain: plain }
+        %{ chain_walker_context | s_plain: to_string(m_plain) }
     end
   end
 
@@ -367,5 +367,32 @@ defmodule ChainWalker do
     n_index = rem(hash + offset + n_pos, plain_space_total)
 
     %{ chain_walker_context | n_index: n_index }
+  end
+
+  @doc """
+  Step function
+  Starts chain walking process
+  """
+  def step(chain_walker_context, n_chain_length) do
+    index_to_plain(chain_walker_context)
+    |> plain_to_hash
+    |> hash_to_index(0)
+    |> step(n_chain_length, 0)
+  end
+
+  @doc """
+  Step function
+  Performs chain walking until it reaches end of chain given by `n_chain_length`.
+  """
+  def step(chain_walker_context, n_chain_length, index) do
+    case index <= n_chain_length do
+      true ->
+        index_to_plain(chain_walker_context)
+        |> plain_to_hash
+        |> hash_to_index(index)
+        |> step(n_chain_length, index+1)
+      _ ->
+        chain_walker_context
+    end
   end
 end

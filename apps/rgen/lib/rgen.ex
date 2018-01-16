@@ -42,7 +42,7 @@ defmodule Rgen do
   """
   def parse_args(args) do
     # Default options
-    options = %{ filename_suffix: 0 }
+    options = %{ part: "" }
     # Parse args
     cmd_opts = OptionParser.parse(
       args,
@@ -55,13 +55,11 @@ defmodule Rgen do
         chainlength: :integer,
         numchains: :integer,
         tableindex: :integer,
-        filename_suffix: :string,
+        part: :string,
         benchmark: :boolean
         ],
       aliases: [h: :help]
     )
-
-    # IO.puts cmd_opts
 
     case cmd_opts do
       { [], [], _ }             -> :help
@@ -131,7 +129,7 @@ defmodule Rgen do
 
     n_chain_length  = options.chainlength
     n_numchains     = options.numchains
-    s_filename_suffix = options.filename_suffix
+    s_filename_suffix = options.part
 
     # n_numchains check
     if n_numchains >= 134217728 do
@@ -150,6 +148,8 @@ defmodule Rgen do
 
     s_filename = "#{s_hash_routine}_#{s_charset}##{n_min_length}-#{n_max_length}_#{n_table_index}_#{n_chain_length}x#{n_numchains}_#{s_filename_suffix}.rt"
 
+    IO.inspect s_filename
+
     case File.open(s_filename, [:append, :binary]) do
       { :ok, file }       -> File.close(file)
       { :error, reason }  -> raise File.Error, message: reason
@@ -163,7 +163,9 @@ defmodule Rgen do
 
     data_length = IO.binread(file, :all) |> String.length
 
-    n_data_length = div(data_length, 16 * 16)
+    IO.inspect data_length
+
+    n_data_length = div(data_length, 16) * 16
 
     if n_data_length == n_numchains * 16 do
       IO.puts "Precomputation of this rainbow table already finished"
@@ -177,44 +179,32 @@ defmodule Rgen do
 
     IO.puts "Generating..."
 
-    start_time = System.system_time
-    for index <- div(n_data_length, 16)..n_numchains do
+    IO.inspect "Starting position: #{div(n_data_length, 16)}"
+    IO.inspect "Number Of Chains: #{n_numchains}"
+
+    # start_time = System.system_time
+    start_time = :erlang.timestamp
+    Enum.each div(n_data_length, 16)..(n_numchains-1), fn(index) ->
       chain_walker_context =
         ChainWalker.generate_random_index(chain_walker_context)
 
-      # n_index = chain_walker_context.n_index
+      IO.binwrite file, <<chain_walker_context.n_index::64>>
+
+      chain_walker_context =
+        ChainWalker.step(chain_walker_context, n_chain_length)
 
       IO.binwrite file, <<chain_walker_context.n_index::64>>
 
-      chain_walker_context = step(chain_walker_context, n_chain_length, n_numchains)
+      if rem(index+1, 100_000) == 0 || index+1 == n_numchains do
+        finish_time = :erlang.timestamp
+        n_second =
+          :timer.now_diff(finish_time, start_time)
+          |> div(1_000_000)
 
-      IO.binwrite file, <<chain_walker_context.n_index::64>>
-
-      if rem(index+1, 100000) == 0 || index+1 == n_numchains do
-        finish_time = System.system_time
-        n_second = div((finish_time - start_time), 1000000)
         IO.puts "#{index+1} of #{n_numchains} rainbow chains generated (#{div(n_second, 60)} m #{rem(n_second, 60)} s)"
       end
     end
 
     File.close(file)
-  end
-
-  def step(chain_walker_context, n_chain_length, n_numchains) do
-    ChainWalker.index_to_plain(chain_walker_context)
-    |> ChainWalker.plain_to_hash
-    |> ChainWalker.hash_to_index(0)
-    |> step(n_chain_length, n_numchains, 0)
-  end
-
-  def step(chain_walker_context, n_chain_length, n_numchains, index) do
-    unless index >= n_numchains do
-      ChainWalker.index_to_plain(chain_walker_context)
-      |> ChainWalker.plain_to_hash
-      |> ChainWalker.hash_to_index(index)
-      |> step(n_chain_length, index)
-    end
-
-    chain_walker_context
   end
 end
