@@ -92,7 +92,7 @@ defmodule ChainWalker do
 
   def set_charset(chain_walker_context, s_charset) do
     charsets = %{
-      alpha: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      "alpha": 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
       "alpha-numeric": 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
       "alpha-numeric-symbol14": 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=',
       "all": 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=~`[]{}|\\:;"\'<>,.?/',
@@ -107,8 +107,9 @@ defmodule ChainWalker do
   end
 
   def set_charset_length(chain_walker_context) do
-    length = Map.get(chain_walker_context, :s_charset)
-    |> length
+    length =
+      Map.get(chain_walker_context, :s_charset)
+      |> length
     %{ chain_walker_context | n_charset_length: length }
   end
 
@@ -307,23 +308,41 @@ defmodule ChainWalker do
     %{ chain_walker_context | n_index: n_index }
   end
 
+  def set_current_index(chain_walker_context, index) do
+    n_index =
+      rem(index, chain_walker_context.n_plain_space_total)
+    %{ chain_walker_context | n_index: n_index }
+  end
+
   @doc """
   Index to plain
   """
-  def index_to_plain(chain_walker_context) do
-    chain_walker_context
-    |> set_plain_length(chain_walker_context.n_max_length-1)
+  def index_to_plain(cwc) do
+    cwc
+    |> set_plain_length(cwc.n_min_length, cwc.n_max_length - 1)
     |> get_index_of_x
     |> build_plain
   end
 
-  defp set_plain_length(chain_walker_context, index) do
-    case chain_walker_context.n_index >= Enum.at(chain_walker_context.n_plain_space_upto_x, index) do
-      true  -> %{ chain_walker_context | n_plain_length: index+1 }
-      _     ->
-        if index >= chain_walker_context.n_min_length do
-          set_plain_length(chain_walker_context, index-1)
-        end
+  # defp set_plain_length(chain_walker_context, index) do
+  #   IO.inspect "n_index: #{chain_walker_context.n_index}"
+  #   IO.inspect "psux: #{Enum.at(chain_walker_context.n_plain_space_upto_x, index)}"
+  #
+  #   case chain_walker_context.n_index >= Enum.at(chain_walker_context.n_plain_space_upto_x, index) do
+  #     true  ->
+  #       %{ chain_walker_context | n_plain_length: index+1 }
+  #     _     ->
+  #       if index >= chain_walker_context.n_min_length do
+  #         set_plain_length(chain_walker_context, index-1)
+  #       end
+  #   end
+  # end
+
+  defp set_plain_length(cwc, n_min_length, index)
+  when index >= n_min_length - 1 do
+    case cwc.n_index >= Enum.at(cwc.n_plain_space_upto_x, index) do
+      true -> %{ cwc | n_plain_length: index + 1 }
+      _    -> set_plain_length(cwc, n_min_length, index - 1)
     end
   end
 
@@ -338,18 +357,22 @@ defmodule ChainWalker do
     build_plain(chain_walker_context, n_index_of_x, m_plain, chain_walker_context.n_plain_length-1)
   end
 
-  defp build_plain(chain_walker_context, n_index_of_x, m_plain, index) do
-    case index >= 0 do
-      true  ->
-        char = Enum.at(chain_walker_context.s_charset, rem(n_index_of_x, chain_walker_context.n_charset_length))
-        l = List.update_at(m_plain, index, &(&1 = char))
-        n_index_of_x = div(n_index_of_x, chain_walker_context.n_charset_length)
-        build_plain(chain_walker_context, n_index_of_x, l, index-1)
-      _     ->
-        %{ chain_walker_context | s_plain: to_string(m_plain) }
-    end
+  defp build_plain(chain_walker_context, n_index_of_x, m_plain, index)
+  when index >= 0 do
+    char = Enum.at(chain_walker_context.s_charset, rem(n_index_of_x, chain_walker_context.n_charset_length))
+    l = List.update_at(m_plain, index, &(&1 = char))
+    n_index_of_x = div(n_index_of_x, chain_walker_context.n_charset_length)
+    build_plain(chain_walker_context, n_index_of_x, l, index-1)
   end
 
+  defp build_plain(chain_walker_context, _n_index_of_x, m_plain, index)
+  when index < 0 do
+    %{ chain_walker_context | s_plain: to_string(m_plain) }
+  end
+
+  @doc """
+    Create hash from plain text
+  """
   def plain_to_hash(chain_walker_context) do
     %{ m_hash_routine: routine, s_plain: password } = chain_walker_context
     set_hash(chain_walker_context, routine.hash.(password))
@@ -360,13 +383,27 @@ defmodule ChainWalker do
   end
 
   def hash_to_index(chain_walker_context, n_pos) do
-    hash = chain_walker_context.s_hash |> String.to_integer(16)
+    # hash = chain_walker_context.s_hash |> String.to_integer(16)
     offset = chain_walker_context.n_reduce_offset
     plain_space_total = chain_walker_context.n_plain_space_total
 
-    n_index = rem(hash + offset + n_pos, plain_space_total)
+    IO.inspect chain_walker_context.s_hash
+
+    reduced_hash = reduce_hash(chain_walker_context.s_hash)
+
+    # IO.inspect reduced_hash
+
+    n_index = rem(reduced_hash + offset + n_pos, plain_space_total)
 
     %{ chain_walker_context | n_index: n_index }
+  end
+
+  def reduce_hash(s_hash) do
+    s_hash
+    |> String.slice(0..3)
+    |> String.reverse
+    |> Base.encode16
+    |> String.to_integer(16)
   end
 
   @doc """
@@ -380,19 +417,18 @@ defmodule ChainWalker do
     |> step(n_chain_length, 0)
   end
 
-  @doc """
-  Step function
-  Performs chain walking until it reaches end of chain given by `n_chain_length`.
-  """
-  def step(chain_walker_context, n_chain_length, index) do
-    case index <= n_chain_length do
-      true ->
-        index_to_plain(chain_walker_context)
-        |> plain_to_hash
-        |> hash_to_index(index)
-        |> step(n_chain_length, index+1)
-      _ ->
-        chain_walker_context
-    end
+  defp step(chain_walker_context, n_chain_length, index)
+  when index < n_chain_length do
+    # IO.inspect "Leading indices: #{index}"
+    index_to_plain(chain_walker_context)
+    |> plain_to_hash
+    |> hash_to_index(index)
+    |> step(n_chain_length, index + 1)
+  end
+
+  defp step(chain_walker_context, n_chain_length, index)
+  when index >= (n_chain_length) do
+    # IO.inspect "Final index: #{index}"
+    chain_walker_context
   end
 end

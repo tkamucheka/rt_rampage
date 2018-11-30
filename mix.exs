@@ -23,7 +23,8 @@ defmodule RtRampage.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      {:benchee, "~> 0.11", only: :dev}
+      {:benchee, "~> 0.11", only: :dev},
+      {:hexate,  ">= 0.6.0"}
     ]
   end
 end
