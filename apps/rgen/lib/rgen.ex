@@ -1,6 +1,33 @@
 defmodule Rgen do
   @moduledoc """
   Documentation for Rgen.
+
+  usage: rtgen hash_algorithm=<algorithm> \\
+	              plain_charset=<path> plain_len_min=<number> plain_len_max=<number> \\
+	              rainbow_table_index=<number> \\
+	              rainbow_chain_length=<number> rainbow_chain_count=<number> \\
+	              file_title_suffix=<any>
+	        rtgen hash_algorithm=<algorithm> \\
+	              plain_charset=<path> plain_len_min=<number> plain_len_max=<number> \\
+	              rainbow_table_index=<number> \\
+	              -bench
+
+	hash_algorithm:       available: []
+	plain_charset:        use any charset name in charset.txt here
+	                       use \"byte\" to specify all 256 characters as the charset of the plaintext
+	plain_len_min:        min length of the plaintext
+	plain_len_max:        max length of the plaintext
+	rainbow_table_index:  index of the rainbow table
+	rainbow_chain_length: length of the rainbow chain
+	rainbow_chain_count:  count of the rainbow chain to generate
+	file_title_suffix:    the string appended to the file title
+	                       add your comment of the generated rainbow table here
+  -bench:               do some benchmark
+  
+	example: rtgen lm alpha 1 7 0 100 16 test
+	          rtgen md5 byte 4 4 0 100 16 test
+	          rtgen sha1 numeric 1 10 0 100 16 test
+	          rtgen lm alpha 1 7 0 -bench
   """
 
   @doc """
@@ -40,6 +67,7 @@ defmodule Rgen do
           options.tableindex
         )
       end
+      System.halt(0)
     end
 
     unless map_size(options) == 8 do
