@@ -10,7 +10,7 @@ defmodule Rgen.Application do
     children = [
       # Starts a worker by calling: Rgen.Worker.start_link(arg)
       # {Rgen.Worker, arg},
-      {AutoCluster.Worker, []},
+      # {AutoCluster.Worker, []},
       {Rgen.TableGenerator, []},
       {Task.Supervisor, [name: Rgen.TaskSupervisor]}
     ]

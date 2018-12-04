@@ -42,11 +42,11 @@ use Mix.Config
 config :libcluster,
   topologies: [
     autocluster: [
-      strategy: Elixir.Cluster.Strategy.Gossip,
+      strategy: Cluster.Strategy.Gossip,
       # config: [],
-      connect: {AutoCluster.Worker, :connect, []},
-      disconnect: {AutoCluster.Worker, :disconnect, []},
-      list_nodes: {:erlang, :nodes, [:connected]},
+      connect: {AutoCluster, :connect_node, []},
+      disconnect: {AutoCluster, :disconnect_node, []},
+      # list_nodes: {:erlang, :nodes, [:connected]},
       # child_spec: [restart: :transient]
     ]
   ]

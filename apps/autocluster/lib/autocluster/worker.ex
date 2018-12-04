@@ -9,6 +9,14 @@ defmodule AutoCluster.Worker do
     GenServer.start_link(__MODULE__, [], name: @name)
   end
 
+  def connect(node) do
+    GenServer.cast @name, {:connect, node}
+  end
+
+  def disconnect(node) do
+    GenServer.cast @name, {:disconnect, node}
+  end
+
   def monitor do
     GenServer.cast @name, {:monitor, Process.whereis(:cluster_monitor) }
   end
@@ -21,8 +29,18 @@ defmodule AutoCluster.Worker do
   @impl true
   def init(state) do
     monitor()
-    Application.ensure_all_started :libcluster
+    # Application.ensure_all_started :libcluster
     {:ok, state}
+  end
+
+  def handle_cast({:connect, node}, state) do
+    Logger.info "Going to connect up node #{inspect node}..."
+    :net_kernel.connect_node(node)
+  end
+
+  def handle_cast({:disconnect, node}, state) do
+    Logger.info "Going to disconnect node #{inspect node}..."
+    :net_kernel.disconnect(node)
   end
 
   def handle_cast({:monitor, nil}, state) do

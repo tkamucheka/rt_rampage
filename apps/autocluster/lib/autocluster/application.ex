@@ -11,7 +11,7 @@ defmodule AutoCluster.Application do
 
     # List all child processes to be supervised
     children = [
-      {Cluster.Supervisor, [topologies, [name: AutoClusterSupervisor]]},
+      {Cluster.Supervisor, [topologies, [name: AutoCluster.ClusterSupervisor]]},
       AutoCluster.Worker
     ]
 

@@ -3,6 +3,18 @@ defmodule AutoCluster do
   Documentation for AutoCluster.
   """
 
+  require Logger
+
+  def connect_node(node) do
+    Logger.info "Going to connect up node #{inspect node}..."
+    :net_kernel.connect_node(node)
+  end
+
+  def disconnect_node(node) do
+    Logger.info "Going to disconnect node #{inspect node}..."
+    :net_kernel.disconnect(node)
+  end
+
   def all_nodes do
     Node.list(:known)
       |> display_nodes("All Nodes")

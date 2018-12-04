@@ -9,7 +9,7 @@ defmodule AutoCluster.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.6",
+      # elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -18,7 +18,7 @@ defmodule AutoCluster.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :libcluster],
       mod: {AutoCluster.Application, []}
     ]
   end
